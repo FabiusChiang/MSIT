@@ -20,5 +20,63 @@ Type 'q()' to quit R.
 [Previously saved workspace restored]
 
 > library(car);
-Error in library(car) : there is no package called ‘car’
-Execution halted
+Loading required package: carData
+> 
+> purchase=read.csv("party.csv")
+> head(purchase,4)
+   X particpate elaboration  prefood    pregas   prebank preretail   preother
+1  7          0           0 3.161289 2.4838696  48.77417 0.5645161  0.0000000
+2 12          0           0 0.000000 0.0000000  46.85483 0.3387096 10.9516067
+3 14          0           0 7.564514 0.9032254  67.51611 0.4516127  0.6774192
+4 15          0           0 0.000000 0.0000000 105.90320 0.0000000 20.0967712
+  Rfreq mile1 mile2 mile3 mile4  basemile
+1     0     4     3   166     4  54.98384
+2     0    93     3    23     0  58.14514
+3     0     0     0    84   177  77.11288
+4     0     0     0   639     0 125.99997
+> attach(purchase)
+> 
+> 
+> # model1=lm(mile1 ~ as.factor(particpate)+elaboration+prefood+Rfreq, purchase);
+> # summary(model1);
+> # plot(model1);
+> 
+> purchase$postTotal = mile1 + mile2 + mile3 + mile4;
+> # model2=lm(postTotal ~ as.factor(particpate)+elaboration+Rfreq+basemile, purchase);
+> # summary(model2);
+> # plot(model2);
+> 
+> purchase$diffRatio = (purchase$postTotal - basemile)/basemile;
+> model3=lm(log(diffRatio) ~ as.factor(particpate)+elaboration+Rfreq+log(basemile), purchase);
+Warning message:
+In log(diffRatio) : NaNs produced
+> summary(model3);
+
+Call:
+lm(formula = log(diffRatio) ~ as.factor(particpate) + elaboration + 
+    Rfreq + log(basemile), data = purchase)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-16.4389  -0.6231   0.1225   0.7511   6.0873 
+
+Coefficients:
+                        Estimate Std. Error t value Pr(>|t|)    
+(Intercept)             1.577095   0.027682  56.972   <2e-16 ***
+as.factor(particpate)1  0.043987   0.038505   1.142   0.2533    
+elaboration             0.002665   0.001346   1.981   0.0477 *  
+Rfreq                   0.007934   0.009163   0.866   0.3866    
+log(basemile)          -0.278325   0.007841 -35.495   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.234 on 10110 degrees of freedom
+  (2187 observations deleted due to missingness)
+Multiple R-squared:  0.1123,	Adjusted R-squared:  0.112 
+F-statistic: 319.9 on 4 and 10110 DF,  p-value: < 2.2e-16
+
+> plot(model3);
+> 
+> proc.time()
+   user  system elapsed 
+  0.712   0.048   0.882 
