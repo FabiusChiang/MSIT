@@ -36,47 +36,132 @@ Loading required package: carData
 4     0     0     0   639     0 125.99997
 > attach(purchase)
 > 
+> purchase$postTotal = mile1 + mile2 + mile3 + mile4;
+> purchase$diffRatio = (purchase$postTotal - basemile)/basemile;
 > 
 > # model1=lm(mile1 ~ as.factor(particpate)+elaboration+prefood+Rfreq, purchase);
 > # summary(model1);
 > # plot(model1);
 > 
-> purchase$postTotal = mile1 + mile2 + mile3 + mile4;
-> # model2=lm(postTotal ~ as.factor(particpate)+elaboration+Rfreq+basemile, purchase);
+> # model2=lm(log(diffRatio) ~ as.factor(particpate)+elaboration+Rfreq+log(basemile), purchase);
 > # summary(model2);
 > # plot(model2);
+> # vif(model2)
 > 
-> purchase$diffRatio = (purchase$postTotal - basemile)/basemile;
-> model3=lm(log(diffRatio) ~ as.factor(particpate)+elaboration+Rfreq+log(basemile), purchase);
+> # model21=lm(log(diffRatio) ~ as.factor(particpate)+Rfreq+log(basemile), purchase);
+> # summary(model21);
+> # plot(model21);
+> # vif(model21)
+> 
+> # model3=lm(log(diffRatio) ~ as.factor(particpate)+elaboration+log(basemile), purchase);
+> # summary(model3);
+> # plot(model3);
+> # vif(model3)
+> 
+> model4=lm(log(diffRatio) ~ particpate+log(basemile), purchase);
 Warning message:
 In log(diffRatio) : NaNs produced
-> summary(model3);
+> summary(model4);
 
 Call:
-lm(formula = log(diffRatio) ~ as.factor(particpate) + elaboration + 
-    Rfreq + log(basemile), data = purchase)
+lm(formula = log(diffRatio) ~ particpate + log(basemile), data = purchase)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--16.4389  -0.6231   0.1225   0.7511   6.0873 
+-16.4388  -0.6218   0.1188   0.7510   6.0966 
 
 Coefficients:
-                        Estimate Std. Error t value Pr(>|t|)    
-(Intercept)             1.577095   0.027682  56.972   <2e-16 ***
-as.factor(particpate)1  0.043987   0.038505   1.142   0.2533    
-elaboration             0.002665   0.001346   1.981   0.0477 *  
-Rfreq                   0.007934   0.009163   0.866   0.3866    
-log(basemile)          -0.278325   0.007841 -35.495   <2e-16 ***
+               Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    1.574954   0.027666   56.93  < 2e-16 ***
+particpate     0.103094   0.024549    4.20  2.7e-05 ***
+log(basemile) -0.277272   0.007825  -35.43  < 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 1.234 on 10110 degrees of freedom
+Residual standard error: 1.234 on 10112 degrees of freedom
   (2187 observations deleted due to missingness)
-Multiple R-squared:  0.1123,	Adjusted R-squared:  0.112 
-F-statistic: 319.9 on 4 and 10110 DF,  p-value: < 2.2e-16
+Multiple R-squared:  0.1119,	Adjusted R-squared:  0.1118 
+F-statistic: 637.3 on 2 and 10112 DF,  p-value: < 2.2e-16
 
-> plot(model3);
+> plot(model4);
+> vif(model4)
+   particpate log(basemile) 
+     1.000022      1.000022 
+> 
+> model5=lm(log(diffRatio) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:log(basemile)+particpate:I(log(basemile)^2), purchase);
+Warning message:
+In log(diffRatio) : NaNs produced
+> summary(model5);
+
+Call:
+lm(formula = log(diffRatio) ~ particpate + log(basemile) + I(log(basemile)^2) + 
+    particpate:log(basemile) + particpate:I(log(basemile)^2), 
+    data = purchase)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-16.2948  -0.6073   0.1293   0.7413   5.1537 
+
+Coefficients:
+                               Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                    1.605163   0.037319  43.012  < 2e-16 ***
+particpate                     0.273215   0.051675   5.287 1.27e-07 ***
+log(basemile)                 -0.458101   0.026944 -17.002  < 2e-16 ***
+I(log(basemile)^2)             0.046911   0.005499   8.531  < 2e-16 ***
+particpate:log(basemile)      -0.112396   0.037021  -3.036   0.0024 ** 
+particpate:I(log(basemile)^2)  0.013303   0.007564   1.759   0.0786 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.221 on 10109 degrees of freedom
+  (2187 observations deleted due to missingness)
+Multiple R-squared:  0.1308,	Adjusted R-squared:  0.1304 
+F-statistic: 304.4 on 5 and 10109 DF,  p-value: < 2.2e-16
+
+> plot(model5);
+> vif(model5)
+                   particpate                 log(basemile) 
+                     4.526203                     12.110288 
+           I(log(basemile)^2)      particpate:log(basemile) 
+                    12.081411                     29.108273 
+particpate:I(log(basemile)^2) 
+                    21.402212 
+> 
+> model6=lm(log(diffRatio) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:I(log(basemile)^2), purchase);
+Warning message:
+In log(diffRatio) : NaNs produced
+> summary(model6);
+
+Call:
+lm(formula = log(diffRatio) ~ particpate + log(basemile) + I(log(basemile)^2) + 
+    particpate:I(log(basemile)^2), data = purchase)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-16.2743  -0.6064   0.1292   0.7371   5.2339 
+
+Coefficients:
+                               Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                    1.658621   0.032917  50.388  < 2e-16 ***
+particpate                     0.173041   0.039787   4.349 1.38e-05 ***
+log(basemile)                 -0.517639   0.018485 -28.003  < 2e-16 ***
+I(log(basemile)^2)             0.057976   0.004119  14.074  < 2e-16 ***
+particpate:I(log(basemile)^2) -0.007553   0.003167  -2.385   0.0171 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.222 on 10110 degrees of freedom
+  (2187 observations deleted due to missingness)
+Multiple R-squared:   0.13,	Adjusted R-squared:  0.1297 
+F-statistic: 377.8 on 4 and 10110 DF,  p-value: < 2.2e-16
+
+> plot(model6);
+> vif(model6)
+                   particpate                 log(basemile) 
+                     2.680919                      5.695284 
+           I(log(basemile)^2) particpate:I(log(basemile)^2) 
+                     6.774400                      3.748990 
 > 
 > proc.time()
    user  system elapsed 
-  0.712   0.048   0.882 
+  1.156   0.052   1.401 
