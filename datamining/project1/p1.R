@@ -1,7 +1,7 @@
 library(car);
 
 purchase=read.csv("party.csv")
-head(purchase,4)
+head(purchase,20)
 attach(purchase)
 
 purchase$postTotal = mile1 + mile2 + mile3 + mile4;
@@ -40,3 +40,10 @@ model6=lm(log(diffRatio) ~ particpate+log(basemile)+I(log(basemile)^2)+particpat
 summary(model6);
 plot(model6);
 vif(model6)
+
+purchase$totalRatio = purchase$postTotal/basemile;
+
+model7=lm(log(totalRatio+1) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:I(log(basemile)^2), purchase);
+summary(model7);
+plot(model7);
+vif(model7)
