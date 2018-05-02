@@ -194,40 +194,40 @@ F-statistic: 377.8 on 4 and 10110 DF,  p-value: < 2.2e-16
            I(log(basemile)^2) particpate:I(log(basemile)^2) 
                      6.774400                      3.748990 
 > 
-> purchase$totalRatio = purchase$postTotal/basemile;
+> purchase$totalRatio = (purchase$postTotal+1)/(basemile+1);
 > 
-> model7=lm(log(totalRatio+1) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:I(log(basemile)^2), purchase);
+> model7=lm(log(totalRatio) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:log(basemile), purchase);
 > summary(model7);
 
 Call:
-lm(formula = log(totalRatio + 1) ~ particpate + log(basemile) + 
-    I(log(basemile)^2) + particpate:I(log(basemile)^2), data = purchase)
+lm(formula = log(totalRatio) ~ particpate + log(basemile) + I(log(basemile)^2) + 
+    particpate:log(basemile), data = purchase)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--2.0702 -0.4766  0.0068  0.4296  6.3097 
+-5.7789 -0.5345  0.1386  0.6606  5.2503 
 
 Coefficients:
-                               Estimate Std. Error t value Pr(>|t|)    
-(Intercept)                    1.615016   0.018634  86.670  < 2e-16 ***
-particpate                     0.164969   0.023691   6.963 3.49e-12 ***
-log(basemile)                 -0.128507   0.010024 -12.820  < 2e-16 ***
-I(log(basemile)^2)             0.009026   0.002328   3.876 0.000107 ***
-particpate:I(log(basemile)^2) -0.006939   0.001889  -3.673 0.000240 ***
+                          Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               0.894803   0.027138  32.972  < 2e-16 ***
+particpate                0.219837   0.038086   5.772 8.02e-09 ***
+log(basemile)             0.040288   0.014765   2.729 0.006371 ** 
+I(log(basemile)^2)       -0.018643   0.002862  -6.514 7.62e-11 ***
+particpate:log(basemile) -0.042907   0.012131  -3.537 0.000406 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 0.812 on 12297 degrees of freedom
-Multiple R-squared:  0.04741,	Adjusted R-squared:  0.0471 
-F-statistic:   153 on 4 and 12297 DF,  p-value: < 2.2e-16
+Residual standard error: 1.099 on 12297 degrees of freedom
+Multiple R-squared:  0.01457,	Adjusted R-squared:  0.01425 
+F-statistic: 45.47 on 4 and 12297 DF,  p-value: < 2.2e-16
 
 > plot(model7);
 > vif(model7)
-                   particpate                 log(basemile) 
-                     2.617641                      5.008962 
-           I(log(basemile)^2) particpate:I(log(basemile)^2) 
-                     6.077360                      3.645951 
+              particpate            log(basemile)       I(log(basemile)^2) 
+                3.690511                 5.928526                 5.009896 
+particpate:log(basemile) 
+                4.694543 
 > 
 > proc.time()
    user  system elapsed 
-  1.412   0.100   2.120 
+  1.432   0.136   2.178 

@@ -41,9 +41,9 @@ summary(model6);
 plot(model6);
 vif(model6)
 
-purchase$totalRatio = purchase$postTotal/basemile;
+purchase$totalRatio = (purchase$postTotal+1)/(basemile+1);
 
-model7=lm(log(totalRatio+1) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:I(log(basemile)^2), purchase);
+model7=lm(log(totalRatio) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:log(basemile), purchase);
 summary(model7);
 plot(model7);
 vif(model7)

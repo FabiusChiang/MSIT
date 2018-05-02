@@ -1,0 +1,165 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> library(car);
+Loading required package: carData
+> 
+> 
+> purchase=read.csv("party.csv")
+> head(purchase,20)
+    X particpate elaboration     prefood     pregas   prebank  preretail
+1   7          0           0   3.1612892  2.4838696  48.77417  0.5645161
+2  12          0           0   0.0000000  0.0000000  46.85483  0.3387096
+3  14          0           0   7.5645142  0.9032254  67.51611  0.4516127
+4  15          0           0   0.0000000  0.0000000 105.90320  0.0000000
+5  18          0           0   0.1129032  0.0000000  26.75806  0.0000000
+6  19          1           8   0.0000000 13.5483856  33.53226  0.1129032
+7  24          1           8   3.1612892  0.0000000   0.00000  0.0000000
+8  35          0           0   1.6935482  0.0000000  24.38708  0.2258064
+9  39          0           0  11.7419281  0.0000000 131.87085  0.0000000
+10 42          1          23 193.9676514 10.1612854  77.56451  0.3387096
+11 44          0           0   4.4032249  9.7096710  76.77417  0.0000000
+12 51          0           0  47.4193420  4.5161285  16.25806  3.5000000
+13 52          0           0   2.8225803  0.0000000  37.82257  0.1129032
+14 67          0           0   0.1129032  0.5645161 141.35474 21.1128998
+15 68          1          17   0.5645161  0.3387096  98.67737  1.1290321
+16 69          1          26  52.6128845  0.3387096  40.08063  6.6612892
+17 75          1          26   5.3064499  0.0000000  49.45160  0.0000000
+18 76          0           0  47.8709412  2.2580643  58.03226 21.3386993
+19 77          1          40  12.3064499  0.2258064  50.01611  0.7903223
+20 91          0           0   0.1129032  0.0000000  93.25806  0.0000000
+     preother Rfreq mile1 mile2 mile3 mile4   basemile
+1   0.0000000     0     4     3   166     4  54.983845
+2  10.9516067     0    93     3    23     0  58.145144
+3   0.6774192     0     0     0    84   177  77.112885
+4  20.0967712     0     0     0   639     0 125.999969
+5   0.1129032     0     0     0     0    59  26.983863
+6   8.3548355     0     3     2   110     0  55.548381
+7   0.3387096     0     0     1    12     2   3.499999
+8   6.2096748     0   260     0    36     0  32.516114
+9   0.0000000     0    15     2   426    33 143.612778
+10  0.0000000     0   166   266   102    67 282.032161
+11 22.9193420     0    37    22   376     9 113.806408
+12  0.0000000     0    25    61    54    18  71.693527
+13  0.0000000     0    79     1     1    12  40.758054
+14 37.5967712     0   252   147    62    64 200.741827
+15 22.2419281     0     7     2   174     0 122.951554
+16  1.8064508     0   128     0   424    32 101.499962
+17  7.1128998     0     1     8     0   116  61.870949
+18  0.0000000     0    25   147    40    41 129.499962
+19  3.6129017     0   204     5     0    11  66.951594
+20  0.0000000     0    13     0    28     0  93.370960
+> attach(purchase)
+> 
+> purchase$postTotal = mile1 + mile2 + mile3 + mile4;
+> purchase$totalRatio = (purchase$postTotal)/(basemile);
+> 
+> # model1 = lm(mile1~log(1+particpate)+log(1+elaboration)+prefood+
+> #      pregas+   prebank+  preretail+preother+ Rfreq + mile2 + mile3 +mile4)
+> 
+> # vif(model1);
+> 
+> # hist(purchase$basemile)
+> # hist(purchase$prefood)
+> # hist(purchase$pregas)
+> # hist(purchase$prebank)
+> # hist(purchase$preretail)
+> # hist(purchase$preother)
+> # hist(purchase$Rfreq)
+> # hist(purchase$elaboration)
+> 
+> # plot(data.frame(purchase$Rfreq, log(purchase$basemile+1)))
+> # plot(data.frame(purchase$Rfreq, purchase$basemile))
+> 
+> # cor(purchase)
+> 
+> library(sqldf);
+Loading required package: gsubfn
+Loading required package: proto
+Loading required package: RSQLite
+> 
+> # ownMiles = sqldf("SELECT mile1, mile2, mile3, mile4, prefood, prebank, particpate, elaboration, postTotal, basemile FROM purchase WHERE basemile > 0 AND basemile < 25000");
+> # plot(ownMiles)
+> # cor(ownMiles)
+> # summary(lm(postTotal~basemile+particpate, ownMiles))
+> 
+> # ownMiles = sqldf("SELECT mile1, 1/mile2 FROM purchase WHERE mile1 > 0 AND mile2 >0 ");
+> # plot(ownMiles)
+> # cor(ownMiles)
+> 
+> # check = sqldf("SELECT COUNT(*) FROM purchase WHERE postTotal >= 25000 OR basemile >= 25000");
+> # check
+> 
+> # check = sqldf("SELECT COUNT(*) FROM purchase WHERE particpate = 1 AND (postTotal = 0 OR basemile = 0)");
+> # check
+> 
+> # check = sqldf("SELECT COUNT(*) FROM purchase WHERE particpate = 1 AND (basemile = 0)");
+> # check
+> 
+> # check = sqldf("SELECT COUNT(*) FROM purchase");
+> # check
+> 
+> purchase2 = sqldf("SELECT * FROM purchase WHERE postTotal > 0 AND basemile > 0");
+> head(purchase2)
+   X particpate elaboration   prefood     pregas   prebank preretail   preother
+1  7          0           0 3.1612892  2.4838696  48.77417 0.5645161  0.0000000
+2 12          0           0 0.0000000  0.0000000  46.85483 0.3387096 10.9516067
+3 14          0           0 7.5645142  0.9032254  67.51611 0.4516127  0.6774192
+4 15          0           0 0.0000000  0.0000000 105.90320 0.0000000 20.0967712
+5 18          0           0 0.1129032  0.0000000  26.75806 0.0000000  0.1129032
+6 19          1           8 0.0000000 13.5483856  33.53226 0.1129032  8.3548355
+  Rfreq mile1 mile2 mile3 mile4  basemile postTotal totalRatio
+1     0     4     3   166     4  54.98384       177   3.219127
+2     0    93     3    23     0  58.14514       119   2.046603
+3     0     0     0    84   177  77.11288       261   3.384648
+4     0     0     0   639     0 125.99997       639   5.071430
+5     0     0     0     0    59  26.98386        59   2.186492
+6     0     3     2   110     0  55.54838       115   2.070267
+> model2=lm(log(totalRatio) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:log(basemile), purchase2);
+> summary(model2);
+
+Call:
+lm(formula = log(totalRatio) ~ particpate + log(basemile) + I(log(basemile)^2) + 
+    particpate:log(basemile), data = purchase2)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5.7622 -0.5234  0.1226  0.6460  5.0695 
+
+Coefficients:
+                          Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               1.802611   0.030441  59.217  < 2e-16 ***
+particpate                0.200307   0.040786   4.911 9.17e-07 ***
+log(basemile)            -0.466869   0.017021 -27.429  < 2e-16 ***
+I(log(basemile)^2)        0.050963   0.003108  16.398  < 2e-16 ***
+particpate:log(basemile) -0.039492   0.012783  -3.090  0.00201 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.065 on 11738 degrees of freedom
+Multiple R-squared:  0.1379,	Adjusted R-squared:  0.1376 
+F-statistic: 469.3 on 4 and 11738 DF,  p-value: < 2.2e-16
+
+> plot(model2);
+> 
+> proc.time()
+   user  system elapsed 
+  1.088   0.064   1.443 
