@@ -55,3 +55,7 @@ head(purchase2)
 model2=lm(log(totalRatio) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:log(basemile), purchase2);
 summary(model2);
 plot(model2);
+
+model3=lm(log(postTotal) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:log(basemile), purchase2);
+summary(model3);
+plot(model3);

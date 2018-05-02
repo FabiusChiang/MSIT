@@ -160,6 +160,33 @@ F-statistic: 469.3 on 4 and 11738 DF,  p-value: < 2.2e-16
 
 > plot(model2);
 > 
+> model3=lm(log(postTotal) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:log(basemile), purchase2);
+> summary(model3);
+
+Call:
+lm(formula = log(postTotal) ~ particpate + log(basemile) + I(log(basemile)^2) + 
+    particpate:log(basemile), data = purchase2)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5.7622 -0.5234  0.1226  0.6460  5.0695 
+
+Coefficients:
+                          Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               1.802611   0.030441  59.217  < 2e-16 ***
+particpate                0.200307   0.040786   4.911 9.17e-07 ***
+log(basemile)             0.533131   0.017021  31.321  < 2e-16 ***
+I(log(basemile)^2)        0.050963   0.003108  16.398  < 2e-16 ***
+particpate:log(basemile) -0.039492   0.012783  -3.090  0.00201 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.065 on 11738 degrees of freedom
+Multiple R-squared:  0.5432,	Adjusted R-squared:  0.543 
+F-statistic:  3489 on 4 and 11738 DF,  p-value: < 2.2e-16
+
+> plot(model3);
+> 
 > proc.time()
    user  system elapsed 
-  1.088   0.064   1.443 
+  1.424   0.048   1.766 
