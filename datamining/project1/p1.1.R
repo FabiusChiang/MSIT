@@ -59,3 +59,25 @@ plot(model2);
 model3=lm(log(postTotal) ~ particpate+log(basemile)+I(log(basemile)^2)+particpate:log(basemile), purchase2);
 summary(model3);
 plot(model3);
+
+model4=lm(log(postTotal) ~ particpate+log(prefood+1)+I(log(prefood+1)^2)+particpate:log(prefood+1), purchase2);
+summary(model4);
+plot(model4);
+
+model5=lm(log(postTotal) ~ particpate+log(prebank+1)+I(log(prebank+1)^2)+particpate:log(prebank+1), purchase2);
+summary(model5);
+plot(model5);
+
+model6=lm(log(mile1+1) ~ particpate+log(prefood+1)+I(log(prefood+1)^2)+particpate:log(prefood+1), purchase2);
+summary(model6);
+plot(model6);
+
+model7=lm(log(mile1+1) ~ particpate+log(prefood+1)+I(log(prefood+1)^2)+particpate:log(prefood+1)+log(prebank+1)+I(log(prebank+1)^2)+particpate:log(prebank+1), purchase2);
+summary(model7);
+plot(model7);
+
+model7=lm(log(mile1+1) ~ particpate+log(prefood+1)+I(log(prefood+1)^2)+particpate:log(prefood+1)+log(prebank+1)+I(log(prebank+1)^2)+particpate:log(prebank+1), purchase2);
+summary(model7);
+plot(model7);
+
+im1=step(model7, scope=~particpate+log(prefood+1)+I(log(prefood+1)^2)+particpate:log(prefood+1)+log(prebank+1)+I(log(prebank+1)^2)+particpate:log(prebank+1), test="F")
