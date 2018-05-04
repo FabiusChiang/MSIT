@@ -1,0 +1,629 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> library(car);
+Loading required package: carData
+> library(sqldf);
+Loading required package: gsubfn
+Loading required package: proto
+Loading required package: RSQLite
+> set.seed(10086);
+> 
+> purchase=read.csv("party.csv")
+> head(purchase,20)
+    X particpate elaboration     prefood     pregas   prebank  preretail
+1   7          0           0   3.1612892  2.4838696  48.77417  0.5645161
+2  12          0           0   0.0000000  0.0000000  46.85483  0.3387096
+3  14          0           0   7.5645142  0.9032254  67.51611  0.4516127
+4  15          0           0   0.0000000  0.0000000 105.90320  0.0000000
+5  18          0           0   0.1129032  0.0000000  26.75806  0.0000000
+6  19          1           8   0.0000000 13.5483856  33.53226  0.1129032
+7  24          1           8   3.1612892  0.0000000   0.00000  0.0000000
+8  35          0           0   1.6935482  0.0000000  24.38708  0.2258064
+9  39          0           0  11.7419281  0.0000000 131.87085  0.0000000
+10 42          1          23 193.9676514 10.1612854  77.56451  0.3387096
+11 44          0           0   4.4032249  9.7096710  76.77417  0.0000000
+12 51          0           0  47.4193420  4.5161285  16.25806  3.5000000
+13 52          0           0   2.8225803  0.0000000  37.82257  0.1129032
+14 67          0           0   0.1129032  0.5645161 141.35474 21.1128998
+15 68          1          17   0.5645161  0.3387096  98.67737  1.1290321
+16 69          1          26  52.6128845  0.3387096  40.08063  6.6612892
+17 75          1          26   5.3064499  0.0000000  49.45160  0.0000000
+18 76          0           0  47.8709412  2.2580643  58.03226 21.3386993
+19 77          1          40  12.3064499  0.2258064  50.01611  0.7903223
+20 91          0           0   0.1129032  0.0000000  93.25806  0.0000000
+     preother Rfreq mile1 mile2 mile3 mile4   basemile
+1   0.0000000     0     4     3   166     4  54.983845
+2  10.9516067     0    93     3    23     0  58.145144
+3   0.6774192     0     0     0    84   177  77.112885
+4  20.0967712     0     0     0   639     0 125.999969
+5   0.1129032     0     0     0     0    59  26.983863
+6   8.3548355     0     3     2   110     0  55.548381
+7   0.3387096     0     0     1    12     2   3.499999
+8   6.2096748     0   260     0    36     0  32.516114
+9   0.0000000     0    15     2   426    33 143.612778
+10  0.0000000     0   166   266   102    67 282.032161
+11 22.9193420     0    37    22   376     9 113.806408
+12  0.0000000     0    25    61    54    18  71.693527
+13  0.0000000     0    79     1     1    12  40.758054
+14 37.5967712     0   252   147    62    64 200.741827
+15 22.2419281     0     7     2   174     0 122.951554
+16  1.8064508     0   128     0   424    32 101.499962
+17  7.1128998     0     1     8     0   116  61.870949
+18  0.0000000     0    25   147    40    41 129.499962
+19  3.6129017     0   204     5     0    11  66.951594
+20  0.0000000     0    13     0    28     0  93.370960
+> 
+> purchase=sqldf("SELECT * FROM purchase WHERE basemile < 25000");
+> attach(purchase)
+> 
+> 
+> purchase$postTotal = mile1 + mile2 + mile3 + mile4;
+> purchase$totalRatio = (purchase$postTotal)/(basemile);
+> purchase$training = as.integer(runif(nrow(purchase))*5);
+> 
+> purchaseTraining = sqldf("SELECT * FROM purchase WHERE training < 4");
+> purchaseValidation = sqldf("SELECT * FROM purchase WHERE training = 4");
+> im1base=lm(log(mile1+1)~1,purchaseTraining)
+> 
+> im11=step(im1base, scope=~elaboration+log(prefood+1)+I(log(prefood+1)^2)+elaboration:log(prefood+1)+
++ log(prebank+1)+I(log(prebank+1)^2)+elaboration:log(prebank+1)+
++ log(pregas+1)+I(log(pregas+1)^2)+elaboration:log(pregas+1)+
++ log(preretail+1)+I(log(preretail+1)^2)+elaboration:log(preretail+1)+
++ log(preother+1)+I(log(preother+1)^2)+elaboration:log(preother+1)+
++ Rfreq+log(Rfreq+1)+1/Rfreq
++ , test="F", data=purchaseTraining)
+Start:  AIC=11158.78
+log(mile1 + 1) ~ 1
+
+                          Df Sum of Sq   RSS     AIC   F value    Pr(>F)    
++ log(prefood + 1)         1    4188.2 26368  9702.6 1570.8551 < 2.2e-16 ***
++ I(log(prefood + 1)^2)    1    4087.2 26470  9740.4 1527.1413 < 2.2e-16 ***
++ log(prebank + 1)         1    3432.8 27124  9982.0 1251.6761 < 2.2e-16 ***
++ I(log(prebank + 1)^2)    1    3164.1 27393 10079.5 1142.3843 < 2.2e-16 ***
++ log(pregas + 1)          1    1337.6 29219 10718.0  452.7363 < 2.2e-16 ***
++ I(log(pregas + 1)^2)     1     980.8 29576 10838.1  327.9588 < 2.2e-16 ***
++ log(preother + 1)        1     723.2 29834 10923.9  239.7382 < 2.2e-16 ***
++ I(log(preother + 1)^2)   1     544.0 30013 10983.1  179.2617 < 2.2e-16 ***
++ log(preretail + 1)       1     500.7 30056 10997.3  164.7688 < 2.2e-16 ***
++ I(log(preretail + 1)^2)  1     234.9 30322 11084.5   76.6021 < 2.2e-16 ***
++ elaboration              1      39.4 30517 11148.0   12.7654 0.0003548 ***
++ log(Rfreq + 1)           1      24.0 30533 11153.0    7.7777 0.0052995 ** 
++ Rfreq                    1      20.7 30536 11154.1    6.7131 0.0095848 ** 
+<none>                                 30557 11158.8                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=9702.57
+log(mile1 + 1) ~ log(prefood + 1)
+
+                          Df Sum of Sq   RSS     AIC   F value    Pr(>F)    
++ log(prebank + 1)         1    2970.2 23398  8522.4 1255.3093 < 2.2e-16 ***
++ I(log(prebank + 1)^2)    1    2638.3 23730  8661.7 1099.4324 < 2.2e-16 ***
++ log(pregas + 1)          1     897.0 25472  9362.2  348.2312 < 2.2e-16 ***
++ I(log(pregas + 1)^2)     1     665.2 25703  9451.8  255.9352 < 2.2e-16 ***
++ log(preother + 1)        1     472.9 25896  9525.5  180.6023 < 2.2e-16 ***
++ I(log(preother + 1)^2)   1     376.6 25992  9562.3  143.2847 < 2.2e-16 ***
++ log(preretail + 1)       1     236.7 26132  9615.4   89.5711 < 2.2e-16 ***
++ I(log(preretail + 1)^2)  1     113.4 26255  9661.9   42.7113 6.657e-11 ***
++ I(log(prefood + 1)^2)    1      73.9 26295  9676.8   27.8061 1.369e-07 ***
++ elaboration              1      26.1 26342  9694.8    9.7967  0.001753 ** 
++ log(Rfreq + 1)           1      11.5 26357  9700.3    4.3018  0.038097 *  
++ Rfreq                    1       7.9 26361  9701.6    2.9486  0.085981 .  
+<none>                                 26368  9702.6                        
+- log(prefood + 1)         1    4188.2 30557 11158.8 1570.8551 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8522.41
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1)
+
+                          Df Sum of Sq   RSS    AIC   F value    Pr(>F)    
++ log(pregas + 1)          1     307.0 23091 8393.8  131.4710 < 2.2e-16 ***
++ I(log(pregas + 1)^2)     1     223.3 23175 8429.6   95.2764 < 2.2e-16 ***
++ log(preother + 1)        1     150.2 23248 8460.7   63.8842 1.467e-15 ***
++ I(log(preother + 1)^2)   1     116.6 23282 8475.0   49.5331 2.080e-12 ***
++ log(preretail + 1)       1      85.6 23313 8488.1   36.3223 1.732e-09 ***
++ I(log(preretail + 1)^2)  1      45.6 23353 8505.1   19.3118 1.122e-05 ***
++ I(log(prefood + 1)^2)    1      32.3 23366 8510.8   13.6494 0.0002215 ***
++ elaboration              1      27.7 23371 8512.7   11.6996 0.0006277 ***
++ I(log(prebank + 1)^2)    1       7.9 23390 8521.1    3.3509 0.0671980 .  
+<none>                                 23398 8522.4                        
++ log(Rfreq + 1)           1       4.7 23394 8522.4    1.9961 0.1577383    
++ Rfreq                    1       1.8 23396 8523.6    0.7814 0.3767333    
+- log(prebank + 1)         1    2970.2 26368 9702.6 1255.3093 < 2.2e-16 ***
+- log(prefood + 1)         1    3725.6 27124 9982.0 1574.5637 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8393.76
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1)
+
+                          Df Sum of Sq   RSS    AIC   F value    Pr(>F)    
++ log(preother + 1)        1     120.5 22971 8344.0   51.8858 6.312e-13 ***
++ I(log(preother + 1)^2)   1      95.4 22996 8354.8   41.0181 1.577e-10 ***
++ log(preretail + 1)       1      64.0 23027 8368.3   27.4977 1.605e-07 ***
++ I(log(prefood + 1)^2)    1      36.7 23055 8380.0   15.7272 7.368e-05 ***
++ I(log(preretail + 1)^2)  1      34.6 23057 8380.9   14.8535 0.0001169 ***
++ elaboration              1      26.2 23065 8384.5   11.2204 0.0008121 ***
++ I(log(prebank + 1)^2)    1      19.7 23072 8387.3    8.4632 0.0036320 ** 
++ I(log(pregas + 1)^2)     1      10.1 23081 8391.4    4.3418 0.0372122 *  
++ log(Rfreq + 1)           1       5.2 23086 8393.5    2.2100 0.1371517    
+<none>                                 23091 8393.8                        
++ Rfreq                    1       1.8 23090 8395.0    0.7885 0.3745763    
+- log(pregas + 1)          1     307.0 23398 8522.4  131.4710 < 2.2e-16 ***
+- log(prebank + 1)         1    2380.3 25472 9362.2 1019.2543 < 2.2e-16 ***
+- log(prefood + 1)         1    3500.4 26592 9788.0 1498.9304 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8343.98
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1)
+
+                          Df Sum of Sq   RSS    AIC   F value    Pr(>F)    
++ log(preretail + 1)       1      54.7 22916 8322.4   23.5992 1.205e-06 ***
++ I(log(prefood + 1)^2)    1      33.9 22937 8331.4   14.6113 0.0001329 ***
++ I(log(prebank + 1)^2)    1      32.8 22938 8331.8   14.1528 0.0001695 ***
++ I(log(preretail + 1)^2)  1      29.1 22942 8333.4   12.5316 0.0004020 ***
++ elaboration              1      25.1 22946 8335.1   10.8356 0.0009992 ***
++ I(log(pregas + 1)^2)     1       9.2 22962 8342.0    3.9628 0.0465447 *  
+<none>                                 22971 8344.0                        
++ log(Rfreq + 1)           1       4.4 22966 8344.1    1.9098 0.1670185    
++ Rfreq                    1       1.5 22969 8345.3    0.6602 0.4165258    
++ I(log(preother + 1)^2)   1       0.0 22971 8346.0    0.0142 0.9052594    
+- log(preother + 1)        1     120.5 23091 8393.8   51.8858 6.312e-13 ***
+- log(pregas + 1)          1     277.4 23248 8460.7  119.3843 < 2.2e-16 ***
+- log(prebank + 1)         1    2159.7 25130 9230.9  929.5805 < 2.2e-16 ***
+- log(prefood + 1)         1    3405.1 26376 9709.3 1465.6096 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8322.39
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1) + log(preretail + 1)
+
+                          Df Sum of Sq   RSS    AIC   F value    Pr(>F)    
++ I(log(prebank + 1)^2)    1      37.1 22879 8308.4   16.0276 6.288e-05 ***
++ I(log(prefood + 1)^2)    1      34.2 22882 8309.6   14.7561 0.0001231 ***
++ elaboration              1      21.5 22895 8315.1    9.2869 0.0023141 ** 
++ I(log(preretail + 1)^2)  1       8.5 22908 8320.7    3.6844 0.0549536 .  
++ I(log(pregas + 1)^2)     1       7.8 22908 8321.0    3.3442 0.0674710 .  
+<none>                                 22916 8322.4                        
++ log(Rfreq + 1)           1       4.2 22912 8322.6    1.7937 0.1805107    
++ Rfreq                    1       1.6 22914 8323.7    0.6941 0.4047816    
++ I(log(preother + 1)^2)   1       0.0 22916 8324.4    0.0002 0.9889404    
+- log(preretail + 1)       1      54.7 22971 8344.0   23.5992 1.205e-06 ***
+- log(preother + 1)        1     111.2 23027 8368.3   47.9751 4.585e-12 ***
+- log(pregas + 1)          1     259.5 23176 8431.8  111.9607 < 2.2e-16 ***
+- log(prebank + 1)         1    2087.4 25003 9182.7  900.4857 < 2.2e-16 ***
+- log(prefood + 1)         1    3297.2 26213 9650.1 1422.4088 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8308.37
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1) + log(preretail + 1) + I(log(prebank + 
+    1)^2)
+
+                          Df Sum of Sq   RSS    AIC   F value    Pr(>F)    
++ I(log(prefood + 1)^2)    1      34.7 22844 8295.4   15.0006 0.0001082 ***
++ elaboration              1      21.0 22858 8301.3    9.0692 0.0026060 ** 
++ I(log(preretail + 1)^2)  1       8.3 22871 8306.8    3.5879 0.0582308 .  
++ I(log(pregas + 1)^2)     1       7.1 22872 8307.3    3.0741 0.0795781 .  
+<none>                                 22879 8308.4                        
++ log(Rfreq + 1)           1       4.3 22875 8308.5    1.8536 0.1734000    
++ Rfreq                    1       1.8 22877 8309.6    0.7628 0.3824683    
++ I(log(preother + 1)^2)   1       0.1 22879 8310.3    0.0398 0.8418531    
+- I(log(prebank + 1)^2)    1      37.1 22916 8322.4   16.0276 6.288e-05 ***
+- log(preretail + 1)       1      59.0 22938 8331.8   25.4749 4.562e-07 ***
+- log(preother + 1)        1     124.5 23004 8360.0   53.7802 2.418e-13 ***
+- log(pregas + 1)          1     273.8 23153 8424.1  118.3068 < 2.2e-16 ***
+- log(prebank + 1)         1     383.2 23262 8470.7  165.5718 < 2.2e-16 ***
+- log(prefood + 1)         1    3317.4 26196 9645.8 1433.3182 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8295.37
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1) + log(preretail + 1) + I(log(prebank + 
+    1)^2) + I(log(prefood + 1)^2)
+
+                          Df Sum of Sq   RSS    AIC  F value    Pr(>F)    
++ elaboration              1     18.90 22825 8289.2   8.1837 0.0042358 ** 
++ I(log(preretail + 1)^2)  1      8.67 22836 8293.6   3.7517 0.0527833 .  
++ I(log(pregas + 1)^2)     1      6.74 22838 8294.4   2.9151 0.0877865 .  
+<none>                                 22844 8295.4                       
++ log(Rfreq + 1)           1      4.04 22840 8295.6   1.7500 0.1859057    
++ Rfreq                    1      1.62 22843 8296.7   0.6989 0.4031605    
++ I(log(preother + 1)^2)   1      0.10 22844 8297.3   0.0417 0.8382866    
+- I(log(prefood + 1)^2)    1     34.67 22879 8308.4  15.0006 0.0001082 ***
+- I(log(prebank + 1)^2)    1     37.61 22882 8309.6  16.2720 5.528e-05 ***
+- log(preretail + 1)       1     59.26 22904 8319.0  25.6406 4.187e-07 ***
+- log(preother + 1)        1    121.73 22966 8345.9  52.6697 4.243e-13 ***
+- log(prefood + 1)         1    186.40 23031 8373.8  80.6474 < 2.2e-16 ***
+- log(pregas + 1)          1    278.21 23122 8413.1 120.3735 < 2.2e-16 ***
+- log(prebank + 1)         1    381.05 23225 8457.0 164.8683 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8289.18
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1) + log(preretail + 1) + I(log(prebank + 
+    1)^2) + I(log(prefood + 1)^2) + elaboration
+
+                                 Df Sum of Sq   RSS    AIC  F value    Pr(>F)
++ I(log(preretail + 1)^2)         1      8.67 22817 8287.4   3.7546 0.0526900
++ I(log(pregas + 1)^2)            1      6.43 22819 8288.4   2.7828 0.0953128
+<none>                                        22825 8289.2                   
++ log(Rfreq + 1)                  1      3.57 22822 8289.6   1.5466 0.2136746
++ elaboration:log(preretail + 1)  1      3.09 22822 8289.8   1.3387 0.2472933
++ Rfreq                           1      1.34 22824 8290.6   0.5793 0.4466137
++ elaboration:log(prebank + 1)    1      1.29 22824 8290.6   0.5579 0.4551090
++ I(log(preother + 1)^2)          1      0.21 22825 8291.1   0.0901 0.7640090
++ elaboration:log(prefood + 1)    1      0.07 22825 8291.1   0.0310 0.8603412
++ elaboration:log(preother + 1)   1      0.07 22825 8291.1   0.0296 0.8633154
++ elaboration:log(pregas + 1)     1      0.00 22825 8291.2   0.0007 0.9789220
+- elaboration                     1     18.90 22844 8295.4   8.1837 0.0042358
+- I(log(prefood + 1)^2)           1     32.60 22858 8301.3  14.1139 0.0001731
+- I(log(prebank + 1)^2)           1     37.08 22862 8303.2  16.0552 6.197e-05
+- log(preretail + 1)              1     55.65 22881 8311.3  24.0945 9.319e-07
+- log(preother + 1)               1    121.10 22946 8339.5  52.4351 4.779e-13
+- log(prefood + 1)                1    190.20 23016 8369.3  82.3533 < 2.2e-16
+- log(pregas + 1)                 1    277.40 23103 8406.7 120.1086 < 2.2e-16
+- log(prebank + 1)                1    380.08 23206 8450.5 164.5683 < 2.2e-16
+                                    
++ I(log(preretail + 1)^2)        .  
++ I(log(pregas + 1)^2)           .  
+<none>                              
++ log(Rfreq + 1)                    
++ elaboration:log(preretail + 1)    
++ Rfreq                             
++ elaboration:log(prebank + 1)      
++ I(log(preother + 1)^2)            
++ elaboration:log(prefood + 1)      
++ elaboration:log(preother + 1)     
++ elaboration:log(pregas + 1)       
+- elaboration                    ** 
+- I(log(prefood + 1)^2)          ***
+- I(log(prebank + 1)^2)          ***
+- log(preretail + 1)             ***
+- log(preother + 1)              ***
+- log(prefood + 1)               ***
+- log(pregas + 1)                ***
+- log(prebank + 1)               ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8287.42
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1) + log(preretail + 1) + I(log(prebank + 
+    1)^2) + I(log(prefood + 1)^2) + elaboration + I(log(preretail + 
+    1)^2)
+
+                                 Df Sum of Sq   RSS    AIC  F value    Pr(>F)
++ I(log(pregas + 1)^2)            1      6.26 22810 8286.7   2.7125 0.0995975
+<none>                                        22817 8287.4                   
++ elaboration:log(preretail + 1)  1      4.15 22813 8287.6   1.7986 0.1799096
++ log(Rfreq + 1)                  1      3.54 22813 8287.9   1.5341 0.2155335
++ elaboration:log(prebank + 1)    1      1.34 22815 8288.8   0.5824 0.4453887
++ Rfreq                           1      1.33 22815 8288.8   0.5753 0.4481823
+- I(log(preretail + 1)^2)         1      8.67 22825 8289.2   3.7546 0.0526900
++ I(log(preother + 1)^2)          1      0.29 22816 8289.3   0.1272 0.7214000
++ elaboration:log(prefood + 1)    1      0.07 22817 8289.4   0.0293 0.8640791
++ elaboration:log(preother + 1)   1      0.06 22817 8289.4   0.0274 0.8684816
++ elaboration:log(pregas + 1)     1      0.00 22817 8289.4   0.0003 0.9865101
+- elaboration                     1     18.90 22836 8293.6   8.1862 0.0042299
+- I(log(prefood + 1)^2)           1     32.95 22850 8299.7  14.2717 0.0001592
+- log(preretail + 1)              1     34.79 22852 8300.5  15.0657 0.0001045
+- I(log(prebank + 1)^2)           1     36.84 22854 8301.4  15.9565 6.529e-05
+- log(preother + 1)               1    120.23 22937 8337.4  52.0702 5.749e-13
+- log(prefood + 1)                1    187.81 23005 8366.5  81.3429 < 2.2e-16
+- log(pregas + 1)                 1    273.64 23090 8403.3 118.5142 < 2.2e-16
+- log(prebank + 1)                1    377.10 23194 8447.6 163.3224 < 2.2e-16
+                                    
++ I(log(pregas + 1)^2)           .  
+<none>                              
++ elaboration:log(preretail + 1)    
++ log(Rfreq + 1)                    
++ elaboration:log(prebank + 1)      
++ Rfreq                             
+- I(log(preretail + 1)^2)        .  
++ I(log(preother + 1)^2)            
++ elaboration:log(prefood + 1)      
++ elaboration:log(preother + 1)     
++ elaboration:log(pregas + 1)       
+- elaboration                    ** 
+- I(log(prefood + 1)^2)          ***
+- log(preretail + 1)             ***
+- I(log(prebank + 1)^2)          ***
+- log(preother + 1)              ***
+- log(prefood + 1)               ***
+- log(pregas + 1)                ***
+- log(prebank + 1)               ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8286.71
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1) + log(preretail + 1) + I(log(prebank + 
+    1)^2) + I(log(prefood + 1)^2) + elaboration + I(log(preretail + 
+    1)^2) + I(log(pregas + 1)^2)
+
+                                 Df Sum of Sq   RSS    AIC  F value    Pr(>F)
+<none>                                        22810 8286.7                   
++ elaboration:log(preretail + 1)  1      4.04 22806 8287.0   1.7511 0.1857682
++ log(Rfreq + 1)                  1      3.37 22807 8287.2   1.4603 0.2269137
+- I(log(pregas + 1)^2)            1      6.26 22817 8287.4   2.7125 0.0995975
++ elaboration:log(prebank + 1)    1      1.49 22809 8288.1   0.6461 0.4215165
++ Rfreq                           1      1.28 22809 8288.2   0.5543 0.4565685
+- I(log(preretail + 1)^2)         1      8.51 22819 8288.4   3.6842 0.0549590
++ I(log(preother + 1)^2)          1      0.28 22810 8288.6   0.1234 0.7254350
++ elaboration:log(prefood + 1)    1      0.07 22810 8288.7   0.0297 0.8630795
++ elaboration:log(preother + 1)   1      0.04 22810 8288.7   0.0190 0.8905041
++ elaboration:log(pregas + 1)     1      0.00 22810 8288.7   0.0006 0.9802048
+- elaboration                     1     18.59 22829 8292.8   8.0549 0.0045473
+- I(log(prefood + 1)^2)           1     32.61 22843 8298.8  14.1261 0.0001719
+- log(preretail + 1)              1     34.03 22844 8299.5  14.7427 0.0001240
+- I(log(prebank + 1)^2)           1     36.25 22847 8300.4  15.7027 7.464e-05
+- log(pregas + 1)                 1     76.02 22886 8317.6  32.9306 9.832e-09
+- log(preother + 1)               1    119.47 22930 8336.4  51.7537 6.749e-13
+- log(prefood + 1)                1    188.08 22999 8365.9  81.4706 < 2.2e-16
+- log(prebank + 1)                1    374.04 23184 8445.6 162.0275 < 2.2e-16
+                                    
+<none>                              
++ elaboration:log(preretail + 1)    
++ log(Rfreq + 1)                    
+- I(log(pregas + 1)^2)           .  
++ elaboration:log(prebank + 1)      
++ Rfreq                             
+- I(log(preretail + 1)^2)        .  
++ I(log(preother + 1)^2)            
++ elaboration:log(prefood + 1)      
++ elaboration:log(preother + 1)     
++ elaboration:log(pregas + 1)       
+- elaboration                    ** 
+- I(log(prefood + 1)^2)          ***
+- log(preretail + 1)             ***
+- I(log(prebank + 1)^2)          ***
+- log(pregas + 1)                ***
+- log(preother + 1)              ***
+- log(prefood + 1)               ***
+- log(prebank + 1)               ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(im11)
+
+Call:
+lm(formula = log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 
+    1) + log(pregas + 1) + log(preother + 1) + log(preretail + 
+    1) + I(log(prebank + 1)^2) + I(log(prefood + 1)^2) + elaboration + 
+    I(log(preretail + 1)^2) + I(log(pregas + 1)^2), data = purchaseTraining)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.7025 -1.0581 -0.1789  1.0662  5.8821 
+
+Coefficients:
+                         Estimate Std. Error t value Pr(>|t|)    
+(Intercept)              0.541590   0.036871  14.689  < 2e-16 ***
+log(prefood + 1)         0.294305   0.032606   9.026  < 2e-16 ***
+log(prebank + 1)         0.405971   0.031893  12.729  < 2e-16 ***
+log(pregas + 1)          0.292110   0.050903   5.739 9.83e-09 ***
+log(preother + 1)        0.139615   0.019407   7.194 6.75e-13 ***
+log(preretail + 1)       0.232927   0.060664   3.840 0.000124 ***
+I(log(prebank + 1)^2)   -0.031346   0.007910  -3.963 7.46e-05 ***
+I(log(prefood + 1)^2)    0.027915   0.007427   3.758 0.000172 ***
+elaboration              0.003030   0.001068   2.838 0.004547 ** 
+I(log(preretail + 1)^2) -0.043822   0.022831  -1.919 0.054959 .  
+I(log(pregas + 1)^2)    -0.031753   0.019280  -1.647 0.099597 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.519 on 9881 degrees of freedom
+Multiple R-squared:  0.2535,	Adjusted R-squared:  0.2527 
+F-statistic: 335.6 on 10 and 9881 DF,  p-value: < 2.2e-16
+
+> plot(im11)
+> 
+> im12=step(im1base, scope=~elaboration+log(prefood+1)+elaboration:log(prefood+1)+
++ log(prebank+1)+elaboration:log(prebank+1)+
++ log(pregas+1)+elaboration:log(pregas+1)+
++ log(preretail+1)+elaboration:log(preretail+1)+
++ log(preother+1)+elaboration:log(preother+1)+
++ Rfreq+log(Rfreq+1)+1/Rfreq
++ , test="F", data=purchaseTraining)
+Start:  AIC=11158.78
+log(mile1 + 1) ~ 1
+
+                     Df Sum of Sq   RSS     AIC   F value    Pr(>F)    
++ log(prefood + 1)    1    4188.2 26368  9702.6 1570.8551 < 2.2e-16 ***
++ log(prebank + 1)    1    3432.8 27124  9982.0 1251.6761 < 2.2e-16 ***
++ log(pregas + 1)     1    1337.6 29219 10718.0  452.7363 < 2.2e-16 ***
++ log(preother + 1)   1     723.2 29834 10923.9  239.7382 < 2.2e-16 ***
++ log(preretail + 1)  1     500.7 30056 10997.3  164.7688 < 2.2e-16 ***
++ elaboration         1      39.4 30517 11148.0   12.7654 0.0003548 ***
++ log(Rfreq + 1)      1      24.0 30533 11153.0    7.7777 0.0052995 ** 
++ Rfreq               1      20.7 30536 11154.1    6.7131 0.0095848 ** 
+<none>                            30557 11158.8                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=9702.57
+log(mile1 + 1) ~ log(prefood + 1)
+
+                     Df Sum of Sq   RSS     AIC   F value    Pr(>F)    
++ log(prebank + 1)    1    2970.2 23398  8522.4 1255.3093 < 2.2e-16 ***
++ log(pregas + 1)     1     897.0 25472  9362.2  348.2312 < 2.2e-16 ***
++ log(preother + 1)   1     472.9 25896  9525.5  180.6023 < 2.2e-16 ***
++ log(preretail + 1)  1     236.7 26132  9615.4   89.5711 < 2.2e-16 ***
++ elaboration         1      26.1 26342  9694.8    9.7967  0.001753 ** 
++ log(Rfreq + 1)      1      11.5 26357  9700.3    4.3018  0.038097 *  
++ Rfreq               1       7.9 26361  9701.6    2.9486  0.085981 .  
+<none>                            26368  9702.6                        
+- log(prefood + 1)    1    4188.2 30557 11158.8 1570.8551 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8522.41
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1)
+
+                     Df Sum of Sq   RSS    AIC   F value    Pr(>F)    
++ log(pregas + 1)     1     307.0 23091 8393.8  131.4710 < 2.2e-16 ***
++ log(preother + 1)   1     150.2 23248 8460.7   63.8842 1.467e-15 ***
++ log(preretail + 1)  1      85.6 23313 8488.1   36.3223 1.732e-09 ***
++ elaboration         1      27.7 23371 8512.7   11.6996 0.0006277 ***
+<none>                            23398 8522.4                        
++ log(Rfreq + 1)      1       4.7 23394 8522.4    1.9961 0.1577383    
++ Rfreq               1       1.8 23396 8523.6    0.7814 0.3767333    
+- log(prebank + 1)    1    2970.2 26368 9702.6 1255.3093 < 2.2e-16 ***
+- log(prefood + 1)    1    3725.6 27124 9982.0 1574.5637 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8393.76
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1)
+
+                     Df Sum of Sq   RSS    AIC   F value    Pr(>F)    
++ log(preother + 1)   1     120.5 22971 8344.0   51.8858 6.312e-13 ***
++ log(preretail + 1)  1      64.0 23027 8368.3   27.4977 1.605e-07 ***
++ elaboration         1      26.2 23065 8384.5   11.2204 0.0008121 ***
++ log(Rfreq + 1)      1       5.2 23086 8393.5    2.2100 0.1371517    
+<none>                            23091 8393.8                        
++ Rfreq               1       1.8 23090 8395.0    0.7885 0.3745763    
+- log(pregas + 1)     1     307.0 23398 8522.4  131.4710 < 2.2e-16 ***
+- log(prebank + 1)    1    2380.3 25472 9362.2 1019.2543 < 2.2e-16 ***
+- log(prefood + 1)    1    3500.4 26592 9788.0 1498.9304 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8343.98
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1)
+
+                     Df Sum of Sq   RSS    AIC   F value    Pr(>F)    
++ log(preretail + 1)  1      54.7 22916 8322.4   23.5992 1.205e-06 ***
++ elaboration         1      25.1 22946 8335.1   10.8356 0.0009992 ***
+<none>                            22971 8344.0                        
++ log(Rfreq + 1)      1       4.4 22966 8344.1    1.9098 0.1670185    
++ Rfreq               1       1.5 22969 8345.3    0.6602 0.4165258    
+- log(preother + 1)   1     120.5 23091 8393.8   51.8858 6.312e-13 ***
+- log(pregas + 1)     1     277.4 23248 8460.7  119.3843 < 2.2e-16 ***
+- log(prebank + 1)    1    2159.7 25130 9230.9  929.5805 < 2.2e-16 ***
+- log(prefood + 1)    1    3405.1 26376 9709.3 1465.6096 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8322.39
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1) + log(preretail + 1)
+
+                     Df Sum of Sq   RSS    AIC   F value    Pr(>F)    
++ elaboration         1      21.5 22895 8315.1    9.2869  0.002314 ** 
+<none>                            22916 8322.4                        
++ log(Rfreq + 1)      1       4.2 22912 8322.6    1.7937  0.180511    
++ Rfreq               1       1.6 22914 8323.7    0.6941  0.404782    
+- log(preretail + 1)  1      54.7 22971 8344.0   23.5992 1.205e-06 ***
+- log(preother + 1)   1     111.2 23027 8368.3   47.9751 4.585e-12 ***
+- log(pregas + 1)     1     259.5 23176 8431.8  111.9607 < 2.2e-16 ***
+- log(prebank + 1)    1    2087.4 25003 9182.7  900.4857 < 2.2e-16 ***
+- log(prefood + 1)    1    3297.2 26213 9650.1 1422.4088 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Step:  AIC=8315.1
+log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 1) + log(pregas + 
+    1) + log(preother + 1) + log(preretail + 1) + elaboration
+
+                                 Df Sum of Sq   RSS    AIC   F value    Pr(>F)
+<none>                                        22895 8315.1                    
++ log(Rfreq + 1)                  1       3.6 22891 8315.5    1.5721  0.209928
++ elaboration:log(preretail + 1)  1       2.9 22892 8315.8    1.2588  0.261899
++ elaboration:log(prebank + 1)    1       1.4 22893 8316.5    0.6035  0.437254
++ Rfreq                           1       1.3 22893 8316.5    0.5663  0.451761
++ elaboration:log(preother + 1)   1       0.2 22894 8317.0    0.0899  0.764337
++ elaboration:log(pregas + 1)     1       0.0 22895 8317.1    0.0025  0.960315
++ elaboration:log(prefood + 1)    1       0.0 22895 8317.1    0.0002  0.990078
+- elaboration                     1      21.5 22916 8322.4    9.2869  0.002314
+- log(preretail + 1)              1      51.1 22946 8335.1   22.0471 2.696e-06
+- log(preother + 1)               1     110.6 23005 8360.8   47.7469 5.149e-12
+- log(pregas + 1)                 1     258.9 23154 8424.4  111.8035 < 2.2e-16
+- log(prebank + 1)                1    2091.5 24986 9177.9  903.0366 < 2.2e-16
+- log(prefood + 1)                1    3290.4 26185 9641.5 1420.6608 < 2.2e-16
+                                    
+<none>                              
++ log(Rfreq + 1)                    
++ elaboration:log(preretail + 1)    
++ elaboration:log(prebank + 1)      
++ Rfreq                             
++ elaboration:log(preother + 1)     
++ elaboration:log(pregas + 1)       
++ elaboration:log(prefood + 1)      
+- elaboration                    ** 
+- log(preretail + 1)             ***
+- log(preother + 1)              ***
+- log(pregas + 1)                ***
+- log(prebank + 1)               ***
+- log(prefood + 1)               ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(im12)
+
+Call:
+lm(formula = log(mile1 + 1) ~ log(prefood + 1) + log(prebank + 
+    1) + log(pregas + 1) + log(preother + 1) + log(preretail + 
+    1) + elaboration, data = purchaseTraining)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.5952 -1.0644 -0.1876  1.0777  6.0114 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.530663   0.030739  17.264  < 2e-16 ***
+log(prefood + 1)   0.409824   0.010873  37.692  < 2e-16 ***
+log(prebank + 1)   0.289100   0.009620  30.051  < 2e-16 ***
+log(pregas + 1)    0.208120   0.019683  10.574  < 2e-16 ***
+log(preother + 1)  0.133438   0.019311   6.910 5.15e-12 ***
+log(preretail + 1) 0.124009   0.026411   4.695 2.70e-06 ***
+elaboration        0.003256   0.001068   3.047  0.00231 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.522 on 9885 degrees of freedom
+Multiple R-squared:  0.2508,	Adjusted R-squared:  0.2503 
+F-statistic: 551.4 on 6 and 9885 DF,  p-value: < 2.2e-16
+
+> plot(im12)
+> 
+> yhat=predict(im11, purchaseValidation);
+> mean((log(purchaseValidation$mile1+1)-yhat)^2);
+[1] 2.335478
+> 
+> yhat=predict(im12, purchaseValidation);
+> mean((log(purchaseValidation$mile1+1)-yhat)^2);
+[1] 2.343749
+> 
+> proc.time()
+   user  system elapsed 
+  2.924   0.128   3.925 

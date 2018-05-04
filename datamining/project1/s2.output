@@ -593,37 +593,9 @@ F-statistic:  1008 on 3 and 9888 DF,  p-value: < 2.2e-16
 [1] 2.402248
 > 
 > 
-> summary(glm(particpate~log(1+prefood)+log(1+pregas)+log(1+prebank)+log(1+preother)+log(1++preretail)))
-
-Call:
-glm(formula = particpate ~ log(1 + prefood) + log(1 + pregas) + 
-    log(1 + prebank) + log(1 + preother) + log(1 + +preretail))
-
-Deviance Residuals: 
-     Min        1Q    Median        3Q       Max  
--0.66887  -0.49816  -0.08615   0.50151   0.54040  
-
-Coefficients:
-                      Estimate Std. Error t value Pr(>|t|)    
-(Intercept)          0.4994740  0.0084248  59.286  < 2e-16 ***
-log(1 + prefood)     0.0004659  0.0031982   0.146   0.8842    
-log(1 + pregas)     -0.0017254  0.0058185  -0.297   0.7668    
-log(1 + prebank)    -0.0058958  0.0028342  -2.080   0.0375 *  
-log(1 + preother)   -0.0010208  0.0056934  -0.179   0.8577    
-log(1 + +preretail)  0.0381826  0.0075817   5.036 4.82e-07 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-(Dispersion parameter for gaussian family taken to be 0.2495424)
-
-    Null deviance: 3075.5  on 12301  degrees of freedom
-Residual deviance: 3068.4  on 12296  degrees of freedom
-AIC: 17843
-
-Number of Fisher Scoring iterations: 2
-
+> # summary(glm(particpate~log(1+prefood)+log(1+pregas)+log(1+prebank)+log(1+preother)+log(1++preretail)))
 > 
 > 
 > proc.time()
    user  system elapsed 
-  2.816   0.144   3.642 
+   2.88    0.12    3.56 

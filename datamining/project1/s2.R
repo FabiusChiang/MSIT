@@ -47,5 +47,5 @@ yhat=predict(im2, purchaseValidation);
 mean((log(purchaseValidation$mile1+1)-yhat)^2);
 
 
-summary(glm(particpate~log(1+prefood)+log(1+pregas)+log(1+prebank)+log(1+preother)+log(1++preretail)))
+# summary(glm(particpate~log(1+prefood)+log(1+pregas)+log(1+prebank)+log(1+preother)+log(1++preretail)))
 
