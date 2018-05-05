@@ -1,0 +1,279 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> library(car);
+Loading required package: carData
+> 
+> purchase=read.csv("party.csv")
+> head(purchase,20)
+    X particpate elaboration     prefood     pregas   prebank  preretail
+1   7          0           0   3.1612892  2.4838696  48.77417  0.5645161
+2  12          0           0   0.0000000  0.0000000  46.85483  0.3387096
+3  14          0           0   7.5645142  0.9032254  67.51611  0.4516127
+4  15          0           0   0.0000000  0.0000000 105.90320  0.0000000
+5  18          0           0   0.1129032  0.0000000  26.75806  0.0000000
+6  19          1           8   0.0000000 13.5483856  33.53226  0.1129032
+7  24          1           8   3.1612892  0.0000000   0.00000  0.0000000
+8  35          0           0   1.6935482  0.0000000  24.38708  0.2258064
+9  39          0           0  11.7419281  0.0000000 131.87085  0.0000000
+10 42          1          23 193.9676514 10.1612854  77.56451  0.3387096
+11 44          0           0   4.4032249  9.7096710  76.77417  0.0000000
+12 51          0           0  47.4193420  4.5161285  16.25806  3.5000000
+13 52          0           0   2.8225803  0.0000000  37.82257  0.1129032
+14 67          0           0   0.1129032  0.5645161 141.35474 21.1128998
+15 68          1          17   0.5645161  0.3387096  98.67737  1.1290321
+16 69          1          26  52.6128845  0.3387096  40.08063  6.6612892
+17 75          1          26   5.3064499  0.0000000  49.45160  0.0000000
+18 76          0           0  47.8709412  2.2580643  58.03226 21.3386993
+19 77          1          40  12.3064499  0.2258064  50.01611  0.7903223
+20 91          0           0   0.1129032  0.0000000  93.25806  0.0000000
+     preother Rfreq mile1 mile2 mile3 mile4   basemile
+1   0.0000000     0     4     3   166     4  54.983845
+2  10.9516067     0    93     3    23     0  58.145144
+3   0.6774192     0     0     0    84   177  77.112885
+4  20.0967712     0     0     0   639     0 125.999969
+5   0.1129032     0     0     0     0    59  26.983863
+6   8.3548355     0     3     2   110     0  55.548381
+7   0.3387096     0     0     1    12     2   3.499999
+8   6.2096748     0   260     0    36     0  32.516114
+9   0.0000000     0    15     2   426    33 143.612778
+10  0.0000000     0   166   266   102    67 282.032161
+11 22.9193420     0    37    22   376     9 113.806408
+12  0.0000000     0    25    61    54    18  71.693527
+13  0.0000000     0    79     1     1    12  40.758054
+14 37.5967712     0   252   147    62    64 200.741827
+15 22.2419281     0     7     2   174     0 122.951554
+16  1.8064508     0   128     0   424    32 101.499962
+17  7.1128998     0     1     8     0   116  61.870949
+18  0.0000000     0    25   147    40    41 129.499962
+19  3.6129017     0   204     5     0    11  66.951594
+20  0.0000000     0    13     0    28     0  93.370960
+> attach(purchase)
+> 
+> round(cor(purchase), 2);
+                X particpate elaboration prefood pregas prebank preretail
+X            1.00       0.03        0.01   -0.11  -0.06   -0.20     -0.03
+particpate   0.03       1.00        0.77    0.03   0.00   -0.02      0.03
+elaboration  0.01       0.77        1.00    0.04   0.01    0.00      0.03
+prefood     -0.11       0.03        0.04    1.00   0.04    0.07      0.03
+pregas      -0.06       0.00        0.01    0.04   1.00    0.16      0.02
+prebank     -0.20      -0.02        0.00    0.07   0.16    1.00      0.05
+preretail   -0.03       0.03        0.03    0.03   0.02    0.05      1.00
+preother    -0.05      -0.02       -0.01    0.03   0.03    0.12      0.02
+Rfreq       -0.02       0.01        0.02    0.05   0.00    0.03      0.00
+mile1       -0.11       0.03        0.04    0.31   0.05    0.23      0.02
+mile2       -0.03       0.00        0.00    0.10   0.02    0.07      0.01
+mile3       -0.08       0.00        0.01    0.23   0.08    0.30      0.05
+mile4       -0.09       0.03        0.04    0.22   0.07    0.27      0.02
+basemile    -0.22       0.01        0.03    0.69   0.23    0.71      0.18
+            preother Rfreq mile1 mile2 mile3 mile4 basemile
+X              -0.05 -0.02 -0.11 -0.03 -0.08 -0.09    -0.22
+particpate     -0.02  0.01  0.03  0.00  0.00  0.03     0.01
+elaboration    -0.01  0.02  0.04  0.00  0.01  0.04     0.03
+prefood         0.03  0.05  0.31  0.10  0.23  0.22     0.69
+pregas          0.03  0.00  0.05  0.02  0.08  0.07     0.23
+prebank         0.12  0.03  0.23  0.07  0.30  0.27     0.71
+preretail       0.02  0.00  0.02  0.01  0.05  0.02     0.18
+preother        1.00  0.00  0.07  0.01  0.04  0.07     0.32
+Rfreq           0.00  1.00  0.01  0.01  0.02  0.02     0.05
+mile1           0.07  0.01  1.00  0.03  0.07  0.06     0.36
+mile2           0.01  0.01  0.03  1.00  0.03  0.02     0.11
+mile3           0.04  0.02  0.07  0.03  1.00  0.07     0.36
+mile4           0.07  0.02  0.06  0.02  0.07  1.00     0.33
+basemile        0.32  0.05  0.36  0.11  0.36  0.33     1.00
+> # plot(purchase)
+> 
+> purchase$postTotal = mile1 + mile2 + mile3 + mile4;
+> purchase$diffRatio = (purchase$postTotal - basemile)/basemile;
+> attach(purchase)
+The following objects are masked from purchase (pos = 3):
+
+    basemile, elaboration, mile1, mile2, mile3, mile4, particpate,
+    prebank, prefood, pregas, preother, preretail, Rfreq, X
+
+> 
+> plot(lm(mile1~basemile+particpate))
+> 
+> fit1=lm(log(mile1+1)~particpate+log(prefood+1)+log(preretail+1)+log(preother+1)+log(prebank+1)+log(pregas+1));
+> 
+> 
+> fit2=lm(log(mile2+1)~particpate+log(prefood+1)+log(preretail+1)+log(preother+1)+log(prebank+1)+log(pregas+1));
+> fit3=lm(log(mile3+1)~particpate+log(prefood+1)+log(preretail+1)+log(preother+1)+log(prebank+1)+log(pregas+1));
+> fit4=lm(log(mile4+1)~particpate+log(prefood+1)+log(preretail+1)+log(preother+1)+log(prebank+1)+log(pregas+1));
+> 
+> fit5=lm(log(postTotal+1)~particpate+log(prefood+1)+log(preretail+1)+log(preother+1)+log(prebank+1)+log(pregas+1));
+> plot(fit5)
+> 
+> fit6=lm(log(postTotal+1)~particpate+log(prefood+1)+log(preretail+1)+log(preother+1)+log(prebank+1)+log(pregas+1)
++ +I(log(prefood+1)^2)+I(log(preretail+1)^2)+I(log(preother+1)^2)+I(log(prebank+1)^2)+I(log(pregas+1)^2)
++ );
+> plot(fit6)
+> 
+> # fit21=lm(log(mile1+1)~log(basemile+1)+elaboration)
+> # fit22=lm(log(mile2+1)~log(basemile+1)+elaboration);
+> # fit23=lm(log(mile3+1)~log(basemile+1)+elaboration);
+> # fit24=lm(log(mile4+1)~log(basemile+1)+elaboration);
+> 
+> 
+> summary(fit1)
+
+Call:
+lm(formula = log(mile1 + 1) ~ particpate + log(prefood + 1) + 
+    log(preretail + 1) + log(preother + 1) + log(prebank + 1) + 
+    log(pregas + 1))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.5024 -1.0730 -0.1808  1.0831  6.0014 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.521281   0.029139  17.890  < 2e-16 ***
+particpate         0.083159   0.027506   3.023  0.00251 ** 
+log(prefood + 1)   0.403792   0.009755  41.394  < 2e-16 ***
+log(preretail + 1) 0.134669   0.023149   5.818 6.12e-09 ***
+log(preother + 1)  0.110243   0.017366   6.348 2.25e-10 ***
+log(prebank + 1)   0.300417   0.008646  34.746  < 2e-16 ***
+log(pregas + 1)    0.207084   0.017747  11.669  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.524 on 12295 degrees of freedom
+Multiple R-squared:  0.2512,	Adjusted R-squared:  0.2508 
+F-statistic: 687.3 on 6 and 12295 DF,  p-value: < 2.2e-16
+
+> summary(fit2)
+
+Call:
+lm(formula = log(mile2 + 1) ~ particpate + log(prefood + 1) + 
+    log(preretail + 1) + log(preother + 1) + log(prebank + 1) + 
+    log(pregas + 1))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.6166 -1.0713 -0.2282  1.0308  7.2599 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.519333   0.028553  18.189  < 2e-16 ***
+particpate         0.082721   0.026953   3.069  0.00215 ** 
+log(prefood + 1)   0.381079   0.009559  39.867  < 2e-16 ***
+log(preretail + 1) 0.137200   0.022683   6.048  1.5e-09 ***
+log(preother + 1)  0.107650   0.017016   6.326  2.6e-10 ***
+log(prebank + 1)   0.232419   0.008472  27.433  < 2e-16 ***
+log(pregas + 1)    0.278443   0.017390  16.011  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.493 on 12295 degrees of freedom
+Multiple R-squared:  0.2272,	Adjusted R-squared:  0.2268 
+F-statistic: 602.4 on 6 and 12295 DF,  p-value: < 2.2e-16
+
+> summary(fit3)
+
+Call:
+lm(formula = log(mile3 + 1) ~ particpate + log(prefood + 1) + 
+    log(preretail + 1) + log(preother + 1) + log(prebank + 1) + 
+    log(pregas + 1))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.7847 -1.0236 -0.1999  0.9418  5.5653 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.536660   0.027527  19.496   <2e-16 ***
+particpate         0.062480   0.025985   2.404   0.0162 *  
+log(prefood + 1)   0.386632   0.009215  41.955   <2e-16 ***
+log(preretail + 1) 0.225945   0.021869  10.332   <2e-16 ***
+log(preother + 1)  0.208513   0.016405  12.710   <2e-16 ***
+log(prebank + 1)   0.167767   0.008168  20.540   <2e-16 ***
+log(pregas + 1)    0.336945   0.016766  20.097   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.439 on 12295 degrees of freedom
+Multiple R-squared:  0.2455,	Adjusted R-squared:  0.2451 
+F-statistic: 666.8 on 6 and 12295 DF,  p-value: < 2.2e-16
+
+> summary(fit4)
+
+Call:
+lm(formula = log(mile4 + 1) ~ particpate + log(prefood + 1) + 
+    log(preretail + 1) + log(preother + 1) + log(prebank + 1) + 
+    log(pregas + 1))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.2235 -1.0010 -0.2644  0.8625  6.6674 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.425324   0.027704  15.352  < 2e-16 ***
+particpate         0.041888   0.026153   1.602    0.109    
+log(prefood + 1)   0.398482   0.009275  42.964  < 2e-16 ***
+log(preretail + 1) 0.127849   0.022009   5.809 6.45e-09 ***
+log(preother + 1)  0.065265   0.016511   3.953 7.77e-05 ***
+log(prebank + 1)   0.222404   0.008221  27.055  < 2e-16 ***
+log(pregas + 1)    0.224936   0.016874  13.331  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.449 on 12295 degrees of freedom
+Multiple R-squared:  0.2279,	Adjusted R-squared:  0.2275 
+F-statistic: 604.8 on 6 and 12295 DF,  p-value: < 2.2e-16
+
+> summary(fit5)
+
+Call:
+lm(formula = log(postTotal + 1) ~ particpate + log(prefood + 
+    1) + log(preretail + 1) + log(preother + 1) + log(prebank + 
+    1) + log(pregas + 1))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5.5881 -0.6482  0.0848  0.7296  5.0529 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        1.838865   0.021888  84.011  < 2e-16 ***
+particpate         0.123788   0.020662   5.991 2.14e-09 ***
+log(prefood + 1)   0.465750   0.007328  63.560  < 2e-16 ***
+log(preretail + 1) 0.162433   0.017389   9.341  < 2e-16 ***
+log(preother + 1)  0.186009   0.013045  14.259  < 2e-16 ***
+log(prebank + 1)   0.489076   0.006495  75.303  < 2e-16 ***
+log(pregas + 1)    0.224326   0.013331  16.827  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.145 on 12295 degrees of freedom
+Multiple R-squared:  0.5257,	Adjusted R-squared:  0.5255 
+F-statistic:  2272 on 6 and 12295 DF,  p-value: < 2.2e-16
+
+> 
+> # summary(fit21)
+> # summary(fit22)
+> # summary(fit23)
+> # summary(fit24)
+> 
+> proc.time()
+   user  system elapsed 
+  1.768   0.064   2.244 

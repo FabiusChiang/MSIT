@@ -1,0 +1,294 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> library(car);
+Loading required package: carData
+> 
+> purchase=read.csv("party.csv")
+> head(purchase,20)
+    X particpate elaboration     prefood     pregas   prebank  preretail
+1   7          0           0   3.1612892  2.4838696  48.77417  0.5645161
+2  12          0           0   0.0000000  0.0000000  46.85483  0.3387096
+3  14          0           0   7.5645142  0.9032254  67.51611  0.4516127
+4  15          0           0   0.0000000  0.0000000 105.90320  0.0000000
+5  18          0           0   0.1129032  0.0000000  26.75806  0.0000000
+6  19          1           8   0.0000000 13.5483856  33.53226  0.1129032
+7  24          1           8   3.1612892  0.0000000   0.00000  0.0000000
+8  35          0           0   1.6935482  0.0000000  24.38708  0.2258064
+9  39          0           0  11.7419281  0.0000000 131.87085  0.0000000
+10 42          1          23 193.9676514 10.1612854  77.56451  0.3387096
+11 44          0           0   4.4032249  9.7096710  76.77417  0.0000000
+12 51          0           0  47.4193420  4.5161285  16.25806  3.5000000
+13 52          0           0   2.8225803  0.0000000  37.82257  0.1129032
+14 67          0           0   0.1129032  0.5645161 141.35474 21.1128998
+15 68          1          17   0.5645161  0.3387096  98.67737  1.1290321
+16 69          1          26  52.6128845  0.3387096  40.08063  6.6612892
+17 75          1          26   5.3064499  0.0000000  49.45160  0.0000000
+18 76          0           0  47.8709412  2.2580643  58.03226 21.3386993
+19 77          1          40  12.3064499  0.2258064  50.01611  0.7903223
+20 91          0           0   0.1129032  0.0000000  93.25806  0.0000000
+     preother Rfreq mile1 mile2 mile3 mile4   basemile
+1   0.0000000     0     4     3   166     4  54.983845
+2  10.9516067     0    93     3    23     0  58.145144
+3   0.6774192     0     0     0    84   177  77.112885
+4  20.0967712     0     0     0   639     0 125.999969
+5   0.1129032     0     0     0     0    59  26.983863
+6   8.3548355     0     3     2   110     0  55.548381
+7   0.3387096     0     0     1    12     2   3.499999
+8   6.2096748     0   260     0    36     0  32.516114
+9   0.0000000     0    15     2   426    33 143.612778
+10  0.0000000     0   166   266   102    67 282.032161
+11 22.9193420     0    37    22   376     9 113.806408
+12  0.0000000     0    25    61    54    18  71.693527
+13  0.0000000     0    79     1     1    12  40.758054
+14 37.5967712     0   252   147    62    64 200.741827
+15 22.2419281     0     7     2   174     0 122.951554
+16  1.8064508     0   128     0   424    32 101.499962
+17  7.1128998     0     1     8     0   116  61.870949
+18  0.0000000     0    25   147    40    41 129.499962
+19  3.6129017     0   204     5     0    11  66.951594
+20  0.0000000     0    13     0    28     0  93.370960
+> attach(purchase)
+> 
+> round(cor(purchase), 2);
+                X particpate elaboration prefood pregas prebank preretail
+X            1.00       0.03        0.01   -0.11  -0.06   -0.20     -0.03
+particpate   0.03       1.00        0.77    0.03   0.00   -0.02      0.03
+elaboration  0.01       0.77        1.00    0.04   0.01    0.00      0.03
+prefood     -0.11       0.03        0.04    1.00   0.04    0.07      0.03
+pregas      -0.06       0.00        0.01    0.04   1.00    0.16      0.02
+prebank     -0.20      -0.02        0.00    0.07   0.16    1.00      0.05
+preretail   -0.03       0.03        0.03    0.03   0.02    0.05      1.00
+preother    -0.05      -0.02       -0.01    0.03   0.03    0.12      0.02
+Rfreq       -0.02       0.01        0.02    0.05   0.00    0.03      0.00
+mile1       -0.11       0.03        0.04    0.31   0.05    0.23      0.02
+mile2       -0.03       0.00        0.00    0.10   0.02    0.07      0.01
+mile3       -0.08       0.00        0.01    0.23   0.08    0.30      0.05
+mile4       -0.09       0.03        0.04    0.22   0.07    0.27      0.02
+basemile    -0.22       0.01        0.03    0.69   0.23    0.71      0.18
+            preother Rfreq mile1 mile2 mile3 mile4 basemile
+X              -0.05 -0.02 -0.11 -0.03 -0.08 -0.09    -0.22
+particpate     -0.02  0.01  0.03  0.00  0.00  0.03     0.01
+elaboration    -0.01  0.02  0.04  0.00  0.01  0.04     0.03
+prefood         0.03  0.05  0.31  0.10  0.23  0.22     0.69
+pregas          0.03  0.00  0.05  0.02  0.08  0.07     0.23
+prebank         0.12  0.03  0.23  0.07  0.30  0.27     0.71
+preretail       0.02  0.00  0.02  0.01  0.05  0.02     0.18
+preother        1.00  0.00  0.07  0.01  0.04  0.07     0.32
+Rfreq           0.00  1.00  0.01  0.01  0.02  0.02     0.05
+mile1           0.07  0.01  1.00  0.03  0.07  0.06     0.36
+mile2           0.01  0.01  0.03  1.00  0.03  0.02     0.11
+mile3           0.04  0.02  0.07  0.03  1.00  0.07     0.36
+mile4           0.07  0.02  0.06  0.02  0.07  1.00     0.33
+basemile        0.32  0.05  0.36  0.11  0.36  0.33     1.00
+> # plot(purchase)
+> 
+> purchase$postTotal = mile1 + mile2 + mile3 + mile4;
+> purchase$diffRatio = (purchase$postTotal - basemile)/basemile;
+> 
+> plot(lm(mile1~basemile+particpate))
+> 
+> fit1=lm(log(mile1+1)~log(basemile+1)+particpate);
+> plot(fit1)
+> 
+> fit2=lm(log(mile2+1)~log(basemile+1)+particpate);
+> fit3=lm(log(mile3+1)~log(basemile+1)+particpate);
+> fit4=lm(log(mile4+1)~log(basemile+1)+particpate);
+> 
+> fit21=lm(log(mile1+1)~log(basemile+1)+elaboration)
+> fit22=lm(log(mile2+1)~log(basemile+1)+elaboration);
+> fit23=lm(log(mile3+1)~log(basemile+1)+elaboration);
+> fit24=lm(log(mile4+1)~log(basemile+1)+elaboration);
+> 
+> 
+> summary(fit1)
+
+Call:
+lm(formula = log(mile1 + 1) ~ log(basemile + 1) + particpate)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.0491 -1.1188 -0.1326  1.1470  6.1572 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.09755    0.03547   2.751  0.00596 ** 
+log(basemile + 1)  0.62974    0.01029  61.191  < 2e-16 ***
+particpate         0.07411    0.02779   2.667  0.00766 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.541 on 12299 degrees of freedom
+Multiple R-squared:  0.2338,	Adjusted R-squared:  0.2337 
+F-statistic:  1876 on 2 and 12299 DF,  p-value: < 2.2e-16
+
+> summary(fit2)
+
+Call:
+lm(formula = log(mile2 + 1) ~ log(basemile + 1) + particpate)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.7211 -1.1054 -0.1765  1.0791  7.4299 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.15397    0.03481   4.424 9.79e-06 ***
+log(basemile + 1)  0.57116    0.01010  56.551  < 2e-16 ***
+particpate         0.07710    0.02727   2.827   0.0047 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.512 on 12299 degrees of freedom
+Multiple R-squared:  0.2068,	Adjusted R-squared:  0.2067 
+F-statistic:  1603 on 2 and 12299 DF,  p-value: < 2.2e-16
+
+> summary(fit3)
+
+Call:
+lm(formula = log(mile3 + 1) ~ log(basemile + 1) + particpate)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.6751 -1.0613 -0.1673  1.0579  5.5219 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       0.223922   0.033997   6.586 4.69e-11 ***
+log(basemile + 1) 0.555232   0.009865  56.283  < 2e-16 ***
+particpate        0.064529   0.026636   2.423   0.0154 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.477 on 12299 degrees of freedom
+Multiple R-squared:  0.2052,	Adjusted R-squared:  0.205 
+F-statistic:  1587 on 2 and 12299 DF,  p-value: < 2.2e-16
+
+> summary(fit4)
+
+Call:
+lm(formula = log(mile4 + 1) ~ log(basemile + 1) + particpate)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.4748 -1.0595 -0.1886  0.9401  5.8197 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.07016    0.03381   2.075    0.038 *  
+log(basemile + 1)  0.55384    0.00981  56.459   <2e-16 ***
+particpate         0.03695    0.02649   1.395    0.163    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.469 on 12299 degrees of freedom
+Multiple R-squared:  0.206,	Adjusted R-squared:  0.2058 
+F-statistic:  1595 on 2 and 12299 DF,  p-value: < 2.2e-16
+
+> 
+> summary(fit21)
+
+Call:
+lm(formula = log(mile1 + 1) ~ log(basemile + 1) + elaboration)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.0467 -1.1142 -0.1313  1.1437  6.1389 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       0.101112   0.034107   2.965 0.003037 ** 
+log(basemile + 1) 0.628757   0.010294  61.078  < 2e-16 ***
+elaboration       0.003305   0.000975   3.389 0.000703 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.541 on 12299 degrees of freedom
+Multiple R-squared:  0.234,	Adjusted R-squared:  0.2339 
+F-statistic:  1879 on 2 and 12299 DF,  p-value: < 2.2e-16
+
+> summary(fit22)
+
+Call:
+lm(formula = log(mile2 + 1) ~ log(basemile + 1) + elaboration)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.7174 -1.1063 -0.1802  1.0709  7.4200 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       0.1673698  0.0334799   4.999 5.84e-07 ***
+log(basemile + 1) 0.5704482  0.0101051  56.451  < 2e-16 ***
+elaboration       0.0024740  0.0009571   2.585  0.00975 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.512 on 12299 degrees of freedom
+Multiple R-squared:  0.2067,	Adjusted R-squared:  0.2066 
+F-statistic:  1603 on 2 and 12299 DF,  p-value: < 2.2e-16
+
+> summary(fit23)
+
+Call:
+lm(formula = log(mile3 + 1) ~ log(basemile + 1) + elaboration)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.6539 -1.0590 -0.1646  1.0560  5.5093 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       0.2375797  0.0327020   7.265 3.96e-13 ***
+log(basemile + 1) 0.5547165  0.0098704  56.200  < 2e-16 ***
+elaboration       0.0018279  0.0009349   1.955   0.0506 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.477 on 12299 degrees of freedom
+Multiple R-squared:  0.205,	Adjusted R-squared:  0.2049 
+F-statistic:  1586 on 2 and 12299 DF,  p-value: < 2.2e-16
+
+> summary(fit24)
+
+Call:
+lm(formula = log(mile4 + 1) ~ log(basemile + 1) + elaboration)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.4510 -1.0582 -0.1885  0.9433  5.8218 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       0.0682976  0.0325119   2.101   0.0357 *  
+log(basemile + 1) 0.5532361  0.0098130  56.378   <2e-16 ***
+elaboration       0.0020087  0.0009294   2.161   0.0307 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.469 on 12299 degrees of freedom
+Multiple R-squared:  0.2061,	Adjusted R-squared:  0.206 
+F-statistic:  1597 on 2 and 12299 DF,  p-value: < 2.2e-16
+
+> 
+> proc.time()
+   user  system elapsed 
+  1.308   0.064   1.608 
